@@ -1,4 +1,4 @@
-# CUI_Clash_Resolver
+# CUI-Clash-Resolver
 Timetable Clash resolver for CUI Wah CS Dept (For now)
 
 # TODO
