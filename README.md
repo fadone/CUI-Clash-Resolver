@@ -5,7 +5,7 @@ Timetable Clash resolver for CUI Wah CS Dept (For now)
 3. Select your registered courses
 4. See your timetable and clashes
 
-# TODO
+## TODO
 Clash resolver for:
 - [ ] Electrical Engineering (Undergraduate)
 - [ ] Management Sciences
