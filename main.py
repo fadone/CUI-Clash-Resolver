@@ -10,7 +10,7 @@ FILE = "timetable.pdf"
 
 def process_pdf(file):
     reader = PyPDF2.PdfFileReader(file)
-    tables = camelot.read_pdf(file, copy_text=['h'], pages="1-5")
+    tables = camelot.read_pdf(file, copy_text=['h'], pages="1-end")
     courses = []
 
     for idx, table in enumerate(tables):
@@ -156,11 +156,11 @@ while True:
 
     export = input("Export timetable to excel(y/n):")
     if export == "y":
-        # new_timetable.to_excel("timetable.xlsx")
-        writer = pd.ExcelWriter('timetable.xlsx')
-        new_timetable.to_excel(writer, sheet_name='time_table')
+        new_timetable.to_csv("timetable.csv")
+        # writer = pd.ExcelWriter('timetable.xlsx')
+        # new_timetable.to_excel(writer, sheet_name='time_table')
 
-        writer.sheets['time_table'].set_column(1, 5, 20)
+        # writer.sheets['time_table'].set_column(1, 5, 20)
 
-        writer.save()
+        # writer.save()
         print("timetable.xlsx saved!")
