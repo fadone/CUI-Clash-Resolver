@@ -21,3 +21,4 @@ Clash resolver for:
 - [ ] Management Sciences
 - [ ] Civil Engineering
 - [ ] Mechanical Engineering
+- [ ] Clash resolver show suggestions for alternate course section with less or no clashes.
