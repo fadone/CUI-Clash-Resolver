@@ -5,7 +5,7 @@ Timetable Clash resolver for CUI Wah CS Dept (For now)
 ### Release:
 Download the latest release from release section and run exe.
 Note: You will need <a href='https://ghostscript.com/releases/gsdnld.html' >Ghost Script</a>
-<div><a href='/releases/tag/main'>Latest Release</a></div>
+<div><a href='https://github.com/fadone/CUI-Clash-Resolver/releases/tag/main'>Latest Release</a></div>
 
 ### Build:
 CLI:
