@@ -1,7 +1,12 @@
 # CUI-Clash-Resolver
 Timetable Clash resolver for CUI Wah CS Dept (For now)
-- Note: Its a clash viewer, resolver will be implemented in future updates
+- Note: For now it's a clash viewer, resolver will be implemented in future updates.
 
+### Release:
+Download the latest release from release section and run exe.
+<div><a href='/releases/latest'>Latest Release</a></div>
+
+### Build:
 CLI:
 1. Put timetable.pdf in the same folder
 2. Run the script
