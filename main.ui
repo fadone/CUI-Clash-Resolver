@@ -206,6 +206,19 @@
      <string>Search</string>
     </property>
    </widget>
+   <widget class="QPushButton" name="getBtn">
+    <property name="geometry">
+     <rect>
+      <x>487</x>
+      <y>37</y>
+      <width>131</width>
+      <height>30</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Get from Datafurnish</string>
+    </property>
+   </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
@@ -213,7 +226,7 @@
      <x>0</x>
      <y>0</y>
      <width>1107</width>
-     <height>26</height>
+     <height>21</height>
     </rect>
    </property>
   </widget>

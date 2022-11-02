@@ -23,6 +23,9 @@
       <height>781</height>
      </rect>
     </property>
+    <attribute name="verticalHeaderDefaultSectionSize">
+     <number>50</number>
+    </attribute>
    </widget>
   </widget>
  </widget>

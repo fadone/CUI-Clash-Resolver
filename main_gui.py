@@ -1,24 +1,43 @@
 import os
+import time
 
 import PyPDF2
+import bs4
 import camelot
 import pandas as pd
 from PyQt5.QtCore import QObject, pyqtSignal, QThread, QAbstractTableModel, Qt
 from PyQt5.QtWidgets import QMainWindow, QApplication, QFileDialog, QMessageBox, \
     QTableWidgetItem, QHeaderView
-from PyQt5 import uic, QtGui
+from PyQt5 import QtGui
 import sys
 import cgitb
+import requests
+
+import main_window
+import timetable_window
 
 cgitb.enable(format='text')
 departments = ["CS", "EE", "CE", "ME", "MS"]
 
+DAYS = {
+    "Monday": "Mon",
+    "Tuesday": "Tue",
+    "Wednesday": "Wed",
+    "Thursday": "Thu",
+    "Friday": "Fri",
+    "Saturday": "Sat",
+    "Sunday": "Sun",
+}
 
-class UI(QMainWindow):
+SLOTS = ["1st Slot", "2nd Slot", "3rd Slot", "4th Slot", "5th Slot"]
+
+
+class UI(QMainWindow, main_window.Ui_MainWindow):
     def __init__(self):
         super(UI, self).__init__()
         self.dialog = None
-        uic.loadUi(resource_path("main.ui"), self)
+        # uic.loadUi(resource_path("main.ui"), self)
+        self.setupUi(self)
 
         self.filename = ""
         self.thread = None
@@ -33,6 +52,7 @@ class UI(QMainWindow):
         self.selected_list = []
         self.deptCB.addItems(departments)
         self.browseBtn.clicked.connect(self.browse_pdf)
+        self.getBtn.clicked.connect(self.get_data)
         self.addBtn.clicked.connect(self.add_course)
         self.removeBtn.clicked.connect(self.remove_course)
         self.showBtn.clicked.connect(self.show_timetable)
@@ -50,6 +70,11 @@ class UI(QMainWindow):
         self.filename = QFileDialog.getOpenFileName(self, "Open file", "", "PDF files (*.pdf)")
         self.pathLE.setText(self.filename[0])
         self.upload_pdf()
+
+    def get_data(self):
+        data = process_timetable_from_datafurnish()
+        self.pdf_process_finished(data)
+        self.reset_gui()
 
     def upload_pdf(self):
         self.thread = QThread()
@@ -215,11 +240,12 @@ class TimeTableModel(QAbstractTableModel):
                 return str(self._data.index[section])
 
 
-class TimeTableWindow(QMainWindow):
+class TimeTableWindow(QMainWindow, timetable_window.Ui_MainWindow):
 
     def __init__(self, data, parent=None):
         super(TimeTableWindow, self).__init__(parent)
-        uic.loadUi(resource_path("timetable.ui"), self)
+        self.setupUi(self)
+        # uic.loadUi(resource_path("timetable.ui"), self)
 
         self.model = TimeTableModel(data)
         self.timeTableView.setModel(self.model)
@@ -265,13 +291,52 @@ class Worker(QObject):
         self.finished.emit(courses)
 
 
+def process_timetable_from_datafurnish():
+    url = "https://portal.cuiwah.edu.pk/"
+    url2 = "https://portal.cuiwah.edu.pk/DataFurnish3.php?page=1000"
+    session = requests.Session()
+    response = session.get(url, verify=False)
+    time.sleep(1)
+    response = session.get("https://portal.cuiwah.edu.pk/dfGeneral.php?rid=560127792&view=TableSimple&page=1000", verify=False)
+    time.sleep(1)
+    response = session.get(url2, verify=False)
+    soup = bs4.BeautifulSoup(response.content, 'html.parser')
+    print(soup.prettify())
+    trs = soup.find_all('tr')
+    data = []
+    for tr in trs[6:-1]:
+        tds = tr.find_all('td')
+        row = []
+        for td in tds:
+            row.append(td.text.strip())
+
+        if row[0] != "BSE" and row[0] != "BCS" and row[0] != "BEE":
+            continue
+        class_ = f"{row[0]}-{row[1]}{row[2]}"
+        day = DAYS[row[4]]
+        slot = SLOTS[int(row[9]) - 1]
+        room = row[6]
+        course = row[3]
+        teacher = row[7]
+        class_type = row[10]
+        if class_type == "Lab":
+            course += " (Lab)"
+        data.append((class_, day, slot, room, course, teacher))
+
+    df = pd.DataFrame(data, columns=["class", "day", "slot", "room", "course", "teacher"])
+    df.sort_values(['class', 'course'], inplace=True)
+    return df
+
+
 def process_pdf(file, progress):
     reader = PyPDF2.PdfFileReader(file)
     courses = []
     total_pages = reader.numPages
     for page in range(total_pages):
+        print(f"Page: {page}")
         table = camelot.read_pdf(file, copy_text=['h'], pages="{}".format(page+1))
-        class_ = reader.getPage(page).extractText().split("\n")[-2]
+        class_ = reader.getPage(page).extractText().split("\n")[-1]
+        print(table)
         tab = table[0].df
         slots = tab.iloc[0]
 
